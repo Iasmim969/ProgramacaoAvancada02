@@ -27,26 +27,50 @@ interface IGeradorIA {
     gerar(prompt: string): string;
 }
 
-class GeradorTexto implements IGeradorIA {
+interface IGeradorTexto {
+    gerarTexto(prompt: string): string;
+}
+
+interface IGeradorImagem {
+    gerarImagem(prompt: string): string;
+}
+
+interface IGeradorAudio {
+    gerarAudio(prompt: string): string;
+}
+
+class GeradorTexto implements IGeradorIA, IGeradorTexto {
     public tipo = "TEXTO";
 
     gerar(prompt: string): string {
+        return this.gerarTexto(prompt);
+    }
+
+    gerarTexto(prompt: string): string {
         return `[Texto Gerado]: Respondendo ao prompt: ${prompt}`;
     }
 }
 
-class GeradorImagem implements IGeradorIA {
+class GeradorImagem implements IGeradorIA, IGeradorImagem {
     public tipo = "IMAGEM";
 
     gerar(prompt: string): string {
+        return this.gerarImagem(prompt);
+    }
+
+    gerarImagem(prompt: string): string {
         return `[Imagem Gerada]: URL da imagem baseada em: ${prompt}`;
     }
 }
 
-class GeradorAudio implements IGeradorIA {
+class GeradorAudio implements IGeradorIA, IGeradorAudio {
     public tipo = "AUDIO";
 
     gerar(prompt: string): string {
+        return this.gerarAudio(prompt);
+    }
+
+    gerarAudio(prompt: string): string {
         return `[Áudio Gerado]: Arquivo de voz para: ${prompt}`;
     }
 }
