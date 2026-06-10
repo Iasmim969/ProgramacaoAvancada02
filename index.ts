@@ -51,6 +51,25 @@ class GeradorAudio implements IGeradorIA {
     }
 }
 
+interface IModeloIA {
+    nome: string;
+    geradores: IGeradorIA[];
+}
+
+class ModeloOmni implements IModeloIA {
+    public nome = "OmniIA";
+    public geradores: IGeradorIA[] = [
+        new GeradorTexto(),
+        new GeradorImagem(),
+        new GeradorAudio(),
+    ];
+}
+
+class ModeloFocadoEmTexto implements IModeloIA {
+    public nome = "ChatGPT-4";
+    public geradores: IGeradorIA[] = [new GeradorTexto()];
+}
+
 // 3. A classe principal orquestra geradores sem conhecer cada tipo concreto
 class AssistenteOmniIA {
     public nomeModelo: string;
@@ -58,11 +77,11 @@ class AssistenteOmniIA {
     private usuarioId: string;
     private geradores: Map<string, IGeradorIA>;
 
-    constructor(nomeModelo: string, servicoCobranca: IServicoCobranca, usuarioId: string, geradores: IGeradorIA[]) {
-        this.nomeModelo = nomeModelo;
+    constructor(modelo: IModeloIA, servicoCobranca: IServicoCobranca, usuarioId: string) {
+        this.nomeModelo = modelo.nome;
         this.servicoCobranca = servicoCobranca;
         this.usuarioId = usuarioId;
-        this.geradores = new Map(geradores.map((gerador) => [gerador.tipo, gerador]));
+        this.geradores = new Map(modelo.geradores.map((gerador) => [gerador.tipo, gerador]));
     }
 
     processarRequisicaoUsuario(prompt: string, tipo: string): void {
@@ -77,12 +96,5 @@ class AssistenteOmniIA {
         gerador.gerar(prompt);
        
         this.servicoCobranca.registrar(this.usuarioId, 1.50);
-    }
-}
-
-// 4. Um modelo específico recebe apenas as capacidades que suporta
-class ModeloFocadoEmTexto extends AssistenteOmniIA {
-    constructor(servicoCobranca: IServicoCobranca, usuarioId: string) {
-        super("ChatGPT-4", servicoCobranca, usuarioId, [new GeradorTexto()]);
     }
 }
