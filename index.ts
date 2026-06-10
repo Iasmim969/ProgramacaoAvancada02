@@ -1,7 +1,23 @@
-// 1. Sistema de cobrança engessado
-class SistemaCobrancaStripe {
-    cobrar(usuarioId: string, valorTokens: number): void {
-        console.log(`Cobrando R$${valorTokens} via Stripe do usuário ${usuarioId}`);
+// 1. Sistema de cobrança dependente de abstrações
+interface IProvedorPagamento {
+    cobrar(usuarioId: string, valor: number): void;
+}
+
+class ProvedorPagamentoStripe implements IProvedorPagamento {
+    cobrar(usuarioId: string, valor: number): void {
+        console.log(`Cobrando R$${valor} via Stripe do usuário ${usuarioId}`);
+    }
+}
+
+class ProvedorPagamentoPayPal implements IProvedorPagamento {
+    cobrar(usuarioId: string, valor: number): void {
+        console.log(`Cobrando R$${valor} via PayPal do usuário ${usuarioId}`);
+    }
+}
+
+class ProvedorPagamentoPix implements IProvedorPagamento {
+    cobrar(usuarioId: string, valor: number): void {
+        console.log(`Cobrando R$${valor} via Pix do usuário ${usuarioId}`);
     }
 }
 
@@ -9,15 +25,15 @@ interface IServicoCobranca {
     registrar(usuarioId: string, valor: number): void;
 }
 
-class ServicoCobrancaStripe implements IServicoCobranca {
-    private sistemaCobranca: SistemaCobrancaStripe;
+class ServicoCobranca implements IServicoCobranca {
+    private provedorPagamento: IProvedorPagamento;
 
-    constructor(sistemaCobranca: SistemaCobrancaStripe = new SistemaCobrancaStripe()) {
-        this.sistemaCobranca = sistemaCobranca;
+    constructor(provedorPagamento: IProvedorPagamento) {
+        this.provedorPagamento = provedorPagamento;
     }
 
     registrar(usuarioId: string, valor: number): void {
-        this.sistemaCobranca.cobrar(usuarioId, valor);
+        this.provedorPagamento.cobrar(usuarioId, valor);
     }
 }
 
