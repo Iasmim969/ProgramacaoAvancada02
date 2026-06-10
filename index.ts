@@ -138,3 +138,25 @@ class AssistenteOmniIA {
         this.servicoCobranca.registrar(this.usuarioId, 1.50);
     }
 }
+
+/*
+Justificativa arquitetural:
+
+SRP: a cobranca foi separada da geracao de IA. AssistenteOmniIA apenas orquestra
+o processamento, enquanto ServicoCobranca cuida do registro de pagamento.
+
+OCP: novos tipos de IA podem ser adicionados criando outro IGeradorIA, como
+GeradorVideo, e registrando-o no modelo, sem alterar AssistenteOmniIA.
+
+LSP: ModeloFocadoEmTexto deixou de herdar de AssistenteOmniIA. Ele agora apenas
+declara suas capacidades em IModeloIA, evitando subclasses que prometem gerar
+imagem/audio e depois lancam erro.
+
+ISP: a antiga interface ampla foi dividida em interfaces menores:
+IGeradorTexto, IGeradorImagem e IGeradorAudio. Cada classe implementa somente
+a capacidade que realmente oferece.
+
+DIP: ServicoCobranca depende da abstracao IProvedorPagamento. Stripe, PayPal e
+Pix sao implementacoes substituiveis, permitindo trocar o meio de pagamento
+sem modificar o servico de cobranca nem o assistente.
+*/
