@@ -5,6 +5,22 @@ class SistemaCobrancaStripe {
     }
 }
 
+interface IServicoCobranca {
+    registrar(usuarioId: string, valor: number): void;
+}
+
+class ServicoCobrancaStripe implements IServicoCobranca {
+    private sistemaCobranca: SistemaCobrancaStripe;
+
+    constructor(sistemaCobranca: SistemaCobrancaStripe = new SistemaCobrancaStripe()) {
+        this.sistemaCobranca = sistemaCobranca;
+    }
+
+    registrar(usuarioId: string, valor: number): void {
+        this.sistemaCobranca.cobrar(usuarioId, valor);
+    }
+}
+
 // 2. Interface "Faz-Tudo"
 interface IModelosIA {
     gerarTexto(prompt: string): string;
@@ -15,9 +31,13 @@ interface IModelosIA {
 // 3. A classe principal que gerencia tudo
 class AssistenteOmniIA implements IModelosIA {
     public nomeModelo: string;
+    private servicoCobranca: IServicoCobranca;
+    private usuarioId: string;
 
-    constructor(nomeModelo: string) {
+    constructor(nomeModelo: string, servicoCobranca: IServicoCobranca, usuarioId: string) {
         this.nomeModelo = nomeModelo;
+        this.servicoCobranca = servicoCobranca;
+        this.usuarioId = usuarioId;
     }
 
     // Processador central cheio de condicionais
@@ -34,8 +54,7 @@ class AssistenteOmniIA implements IModelosIA {
             throw new Error("Tipo de IA não suportado pelo sistema.");
         }
        
-        // Finaliza cobrando o usuário direto aqui
-        this.registrarCobranca(1.50);
+        this.servicoCobranca.registrar(this.usuarioId, 1.50);
     }
 
     gerarTexto(prompt: string): string {
@@ -50,16 +69,12 @@ class AssistenteOmniIA implements IModelosIA {
         return `[Áudio Gerado]: Arquivo de voz para: ${prompt}`;
     }
 
-    registrarCobranca(valor: number): void {
-        const stripe = new SistemaCobrancaStripe();
-        stripe.cobrar("user_999", valor);
-    }
 }
 
 // 4. Um modelo específico sendo forçado a herdar o que não deve
 class ModeloFocadoEmTexto extends AssistenteOmniIA {
-    constructor() {
-        super("ChatGPT-4");
+    constructor(servicoCobranca: IServicoCobranca, usuarioId: string) {
+        super("ChatGPT-4", servicoCobranca, usuarioId);
     }
 
     gerarImagem(prompt: string): string {
