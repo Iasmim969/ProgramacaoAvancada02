@@ -160,3 +160,14 @@ DIP: ServicoCobranca depende da abstracao IProvedorPagamento. Stripe, PayPal e
 Pix sao implementacoes substituiveis, permitindo trocar o meio de pagamento
 sem modificar o servico de cobranca nem o assistente.
 */
+
+// Exemplo de uso
+const cobrancaComPix = new ServicoCobranca(new ProvedorPagamentoPix());
+const assistenteOmni = new AssistenteOmniIA(new ModeloOmni(), cobrancaComPix, "user_999");
+
+assistenteOmni.processarRequisicaoUsuario("Crie uma imagem futurista", "IMAGEM");
+
+const cobrancaComPayPal = new ServicoCobranca(new ProvedorPagamentoPayPal());
+const assistenteTexto = new AssistenteOmniIA(new ModeloFocadoEmTexto(), cobrancaComPayPal, "user_123");
+
+assistenteTexto.processarRequisicaoUsuario("Explique SOLID em poucas palavras", "TEXTO");
